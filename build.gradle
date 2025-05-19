@@ -39,6 +39,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// https://mvnrepository.com/artifact/com.h2database/h2
 	runtimeOnly group: 'com.h2database', name: 'h2', version: '2.3.232'
+	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'  // Основной API
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3' // Реализация
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3' // Для работы с JSON (опционально)
 }
 
 tasks.named('test') {

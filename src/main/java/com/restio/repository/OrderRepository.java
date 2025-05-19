@@ -1,7 +1,11 @@
 package com.restio.repository;
 
 import com.restio.model.Order;
+import com.restio.model.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+import java.util.List;
+
+public interface OrderRepository extends JpaRepository<Order, String> {
+    List<Order> findByStatus(String status);
 }
