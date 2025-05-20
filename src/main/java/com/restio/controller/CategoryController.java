@@ -1,47 +1,61 @@
 package com.restio.controller;
 
-import com.restio.dto.CategoryDTO;
 import com.restio.model.Category;
-import com.restio.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.restio.repository.CategoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
-    private final CategoryService categoryService;
+    private final CategoryRepository categoryRepo;
 
-    @Autowired
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public CategoryController(CategoryRepository categoryRepo) {
+        this.categoryRepo = categoryRepo;
     }
 
     @GetMapping
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+    public List<Category> getAll() {
+        return categoryRepo.findAll();
     }
 
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) {
-        return categoryService.getCategoryById(id);
+    public ResponseEntity<Category> getById(@PathVariable Long id) {
+        Optional<Category> category = categoryRepo.findById(id);
+        return category.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Category createCategory(@RequestBody CategoryDTO categoryDTO) {
-        return categoryService.createCategory(categoryDTO);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Category> create(@RequestBody Category category) {
+        Category saved = categoryRepo.save(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO) {
-        return categoryService.updateCategory(id, categoryDTO);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Category> update(@PathVariable Long id, @RequestBody Category category) {
+        if (!categoryRepo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        category.setId(id);
+        Category updated = categoryRepo.save(category);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
-        categoryService.deleteCategory(id);
-        return ResponseEntity.ok().build();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        if (!categoryRepo.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        categoryRepo.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

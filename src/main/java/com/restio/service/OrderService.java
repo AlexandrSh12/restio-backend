@@ -1,70 +1,137 @@
 package com.restio.service;
 
-import com.restio.exception.ResourceNotFoundException;
+import com.restio.dto.OrderDTO;
+import com.restio.dto.OrderItemDTO;
+import com.restio.model.Dish;
 import com.restio.model.Order;
 import com.restio.model.OrderItem;
 import com.restio.repository.DishRepository;
 import com.restio.repository.OrderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
     private final DishRepository dishRepository;
 
-    @Autowired
     public OrderService(OrderRepository orderRepository, DishRepository dishRepository) {
         this.orderRepository = orderRepository;
         this.dishRepository = dishRepository;
     }
 
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Order getOrderById(String id) {
+    public Optional<OrderDTO> getOrderById(String id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
+                .map(this::convertToDTO);
     }
 
-    public List<Order> getOrdersByStatus(String status) {
-        return orderRepository.findByStatus(status);
-    }
-
-    public Order createOrder(Order order) {
-        // Генерируем UUID если не указан
-        if (order.getId() == null || order.getId().isEmpty()) {
-            order.setId(UUID.randomUUID().toString());
-        }
-
-        // Проверяем наличие блюд
-        if (order.getItems() != null) {
-            for (OrderItem item : order.getItems()) {
-                dishRepository.findById(item.getDish().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Dish", "id", item.getDish().getId()));
-            }
-        }
-
-        // Устанавливаем начальный статус
+    public OrderDTO createOrder(OrderDTO orderDTO) {
+        Order order = convertToEntity(orderDTO);
         if (order.getStatus() == null || order.getStatus().isEmpty()) {
-            order.setStatus("draft");
+            order.setStatus("submitted");
+        }
+        Order savedOrder = orderRepository.save(order);
+        return convertToDTO(savedOrder);
+    }
+
+    public Optional<OrderDTO> updateOrderStatus(String id, String status) {
+        Optional<Order> orderOpt = orderRepository.findById(id);
+        if (orderOpt.isEmpty()) {
+            return Optional.empty();
         }
 
-        return orderRepository.save(order);
-    }
-
-    public Order updateOrderStatus(String id, String status) {
-        Order order = getOrderById(id);
+        Order order = orderOpt.get();
         order.setStatus(status);
-        return orderRepository.save(order);
+        Order updatedOrder = orderRepository.save(order);
+        return Optional.of(convertToDTO(updatedOrder));
     }
 
-    public void deleteOrder(String id) {
-        Order order = getOrderById(id);
-        orderRepository.delete(order);
+    public Optional<OrderDTO> updateOrderComment(String id, String comment) {
+        Optional<Order> orderOpt = orderRepository.findById(id);
+        if (orderOpt.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Order order = orderOpt.get();
+        order.setComment(comment);
+        Order updatedOrder = orderRepository.save(order);
+        return Optional.of(convertToDTO(updatedOrder));
+    }
+
+    // Преобразование Entity в DTO
+    private OrderDTO convertToDTO(Order order) {
+        OrderDTO dto = new OrderDTO();
+        dto.setId(order.getId());
+        dto.setStatus(order.getStatus());
+        dto.setComment(order.getComment());
+
+        if (order.getItems() != null) {
+            List<OrderItemDTO> itemDTOs = order.getItems().stream()
+                    .map(item -> {
+                        OrderItemDTO itemDTO = new OrderItemDTO();
+                        itemDTO.setId(item.getId());
+
+                        if (item.getDish() != null) {
+                            itemDTO.setDishId(item.getDish().getId());
+                            itemDTO.setDishName(item.getDish().getName());
+                            itemDTO.setPrice(item.getDish().getPrice());
+                        }
+
+                        itemDTO.setCount(item.getCount());
+                        return itemDTO;
+                    })
+                    .collect(Collectors.toList());
+
+            dto.setItems(itemDTOs);
+        } else {
+            dto.setItems(new ArrayList<>());
+        }
+
+        return dto;
+    }
+
+    // Преобразование DTO в Entity
+    private Order convertToEntity(OrderDTO dto) {
+        Order order = new Order();
+        order.setId(dto.getId());
+        order.setStatus(dto.getStatus());
+        order.setComment(dto.getComment());
+
+        if (dto.getItems() != null) {
+            List<OrderItem> items = dto.getItems().stream()
+                    .map(itemDTO -> {
+                        OrderItem item = new OrderItem();
+                        if (itemDTO.getId() != null) {
+                            item.setId(itemDTO.getId());
+                        }
+
+                        item.setCount(itemDTO.getCount());
+
+                        if (itemDTO.getDishId() != null) {
+                            // Получаем информацию о блюде из репозитория
+                            Optional<Dish> dishOpt = dishRepository.findById(itemDTO.getDishId());
+                            dishOpt.ifPresent(item::setDish);
+                        }
+
+                        return item;
+                    })
+                    .collect(Collectors.toList());
+
+            order.setItems(items);
+        } else {
+            order.setItems(new ArrayList<>());
+        }
+
+        return order;
     }
 }

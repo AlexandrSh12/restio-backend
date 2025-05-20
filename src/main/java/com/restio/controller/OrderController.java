@@ -1,51 +1,57 @@
 package com.restio.controller;
 
-import java.util.List;
-import com.restio.model.Order;
+import com.restio.dto.OrderDTO;
 import com.restio.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
     private final OrderService orderService;
 
-    @Autowired
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
     @GetMapping
-    public List<Order> getAllOrders() {
-        return orderService.getAllOrders();
+    public ResponseEntity<List<OrderDTO>> getAll() {
+        return ResponseEntity.ok(orderService.getAllOrders());
     }
 
     @GetMapping("/{id}")
-    public Order getOrderById(@PathVariable String id) {
-        return orderService.getOrderById(id);
-    }
-
-    @GetMapping("/status/{status}")
-    public List<Order> getOrdersByStatus(@PathVariable String status) {
-        return orderService.getOrdersByStatus(status);
+    public ResponseEntity<OrderDTO> getById(@PathVariable String id) {
+        return orderService.getOrderById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Order createOrder(@RequestBody Order order) {
-        return orderService.createOrder(order);
+    public ResponseEntity<OrderDTO> create(@RequestBody OrderDTO orderDTO) {
+        OrderDTO created = orderService.createOrder(orderDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}/status")
-    public Order updateOrderStatus(@PathVariable String id, @RequestBody String status) {
-        return orderService.updateOrderStatus(id, status);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderDTO> updateStatus(
+            @PathVariable String id,
+            @RequestParam String status) {
+
+        return orderService.updateOrderStatus(id, status)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrder(@PathVariable String id) {
-        orderService.deleteOrder(id);
-        return ResponseEntity.ok().build();
+    @PatchMapping("/{id}/comment")
+    public ResponseEntity<OrderDTO> updateComment(
+            @PathVariable String id,
+            @RequestParam String comment) {
+
+        return orderService.updateOrderComment(id, comment)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -1,7 +1,5 @@
 package com.restio.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,33 +12,63 @@ import java.util.Date;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ErrorResponse errorDetails = new ErrorResponse(new Date(), HttpStatus.NOT_FOUND.value(),
-                "Not Found", ex.getMessage(), request.getDescription(false));
+    public ResponseEntity<?> handleResourceNotFoundException(
+            ResourceNotFoundException ex, WebRequest request) {
+
+        ErrorDetails errorDetails = new ErrorDetails(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> badRequestException(BadRequestException ex, WebRequest request) {
-        ErrorResponse errorDetails = new ErrorResponse(new Date(), HttpStatus.BAD_REQUEST.value(),
-                "Bad Request", ex.getMessage(), request.getDescription(false));
+    public ResponseEntity<?> handleBadRequestException(
+            BadRequestException ex, WebRequest request) {
+
+        ErrorDetails errorDetails = new ErrorDetails(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
-        ErrorResponse errorDetails = new ErrorResponse(new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error", ex.getMessage(), request.getDescription(false));
+    public ResponseEntity<?> handleGlobalException(
+            Exception ex, WebRequest request) {
+
+        ErrorDetails errorDetails = new ErrorDetails(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class ErrorResponse {
+    // Внутренний класс для представления ошибок
+    private static class ErrorDetails {
         private Date timestamp;
-        private int status;
-        private String error;
         private String message;
         private String details;
+
+        public ErrorDetails(Date timestamp, String message, String details) {
+            this.timestamp = timestamp;
+            this.message = message;
+            this.details = details;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getDetails() {
+            return details;
+        }
     }
 }

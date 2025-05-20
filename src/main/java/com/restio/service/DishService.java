@@ -1,66 +1,86 @@
 package com.restio.service;
 
 import com.restio.dto.DishDTO;
-import com.restio.exception.ResourceNotFoundException;
-import com.restio.model.Category;
 import com.restio.model.Dish;
-import com.restio.repository.CategoryRepository;
 import com.restio.repository.DishRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class DishService {
     private final DishRepository dishRepository;
-    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    public DishService(DishRepository dishRepository, CategoryRepository categoryRepository) {
+    public DishService(DishRepository dishRepository) {
         this.dishRepository = dishRepository;
-        this.categoryRepository = categoryRepository;
     }
 
-    public List<Dish> getAllDishes() {
-        return dishRepository.findAll();
-    }
-
-    public Dish getDishById(Long id) {
-        return dishRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Dish", "id", id));
-    }
-
-    public Dish createDish(DishDTO dishDTO) {
-        Dish dish = new Dish();
-        dish.setName(dishDTO.getName());
-        dish.setCategory(dishDTO.getCategory());
-        dish.setPrice(dishDTO.getPrice());
-        dish.setCookTime(dishDTO.getCookTime());
-        return dishRepository.save(dish);
-    }
-
-    public Dish updateDish(Long id, DishDTO dishDTO) {
-        Dish dish = getDishById(id);
-        dish.setName(dishDTO.getName());
-        dish.setCategory(dishDTO.getCategory());
-        dish.setPrice(dishDTO.getPrice());
-        dish.setCookTime(dishDTO.getCookTime());
-        return dishRepository.save(dish);
-    }
-
-    public void deleteDish(Long id) {
-        Dish dish = getDishById(id);
-        dishRepository.delete(dish);
-    }
-
-    public List<Dish> getDishesByCategory(String categoryName) {
-        Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "name", categoryName));
-
+    public List<DishDTO> getAllDishes() {
         return dishRepository.findAll().stream()
-                .filter(dish -> dish.getCategory().equals(categoryName))
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    public List<DishDTO> getDishesByCategory(String category) {
+        return dishRepository.findByCategory(category).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<DishDTO> getDishById(Long id) {
+        return dishRepository.findById(id)
+                .map(this::convertToDTO);
+    }
+
+    public DishDTO createDish(DishDTO dishDTO) {
+        Dish dish = convertToEntity(dishDTO);
+        Dish savedDish = dishRepository.save(dish);
+        return convertToDTO(savedDish);
+    }
+
+    public Optional<DishDTO> updateDish(Long id, DishDTO dishDTO) {
+        if (!dishRepository.existsById(id)) {
+            return Optional.empty();
+        }
+
+        Dish dish = convertToEntity(dishDTO);
+        dish.setId(id);
+        Dish updatedDish = dishRepository.save(dish);
+        return Optional.of(convertToDTO(updatedDish));
+    }
+
+    public boolean deleteDish(Long id) {
+        if (!dishRepository.existsById(id)) {
+            return false;
+        }
+        dishRepository.deleteById(id);
+        return true;
+    }
+
+    // Преобразование Entity в DTO
+    private DishDTO convertToDTO(Dish dish) {
+        DishDTO dto = new DishDTO();
+        dto.setId(dish.getId());
+        dto.setName(dish.getName());
+        dto.setCategory(dish.getCategory());
+        dto.setPrice(dish.getPrice());
+        dto.setCookTime(dish.getCookTime());
+        return dto;
+    }
+
+    // Преобразование DTO в Entity
+    private Dish convertToEntity(DishDTO dto) {
+        Dish dish = new Dish();
+        // Не устанавливаем id при создании
+        if (dto.getId() != null) {
+            dish.setId(dto.getId());
+        }
+        dish.setName(dto.getName());
+        dish.setCategory(dto.getCategory());
+        dish.setPrice(dto.getPrice());
+        dish.setCookTime(dto.getCookTime());
+        return dish;
     }
 }

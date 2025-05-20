@@ -1,7 +1,6 @@
 package com.restio.dto;
 
 import lombok.Data;
-import java.util.List;
 
 @Data
 public class OrderItemDTO {

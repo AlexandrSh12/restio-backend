@@ -2,7 +2,6 @@ package com.restio.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.List;
 
 @Entity
 @Data
@@ -11,11 +10,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String name;
 
     private String description;
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Dish> dishes;
 }
