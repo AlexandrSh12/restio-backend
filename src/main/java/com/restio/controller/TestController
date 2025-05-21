@@ -1,0 +1,23 @@
+package com.restio.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TestController {
+
+    @GetMapping("/public/greetings") // Path for public access
+    public String publicGreetings() {
+        return "Greetings from a public endpoint!";
+    }
+
+    @GetMapping("/api/user/info") // Path for general authenticated user access
+    public String userInfo() {
+        return "User info endpoint: accessible to any authenticated user.";
+    }
+
+    @GetMapping("/api/admin/action") // Path for admin-only access
+    public String adminAction() {
+        return "Admin action endpoint: accessible only to ADMIN.";
+    }
+}

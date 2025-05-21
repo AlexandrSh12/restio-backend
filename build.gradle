@@ -23,6 +23,7 @@ repositories {
 	mavenCentral()
 }
 
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -43,6 +44,16 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'  // Основной API
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3' // Реализация
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3' // Для работы с JSON (опционально)
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+	// Spring Boot Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Spring Security Test
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+test {
+	useJUnitPlatform()
 }
 
 tasks.named('test') {
