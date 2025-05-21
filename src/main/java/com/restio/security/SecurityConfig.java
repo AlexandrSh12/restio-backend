@@ -21,16 +21,14 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Отключаем CSRF для простоты, в продакшене следует включить
                 .cors(withDefaults()) // Используем настройки CORS из WebConfig
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // Доступ к консоли H2
                         .requestMatchers("/api/public/**").permitAll() // Публичные API (если есть)
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN") // Доступ только для админов
@@ -45,5 +43,9 @@ public class SecurityConfig {
                 .httpBasic(withDefaults()); // Используем базовую HTTP-аутентификацию
 
         return http.build();
+    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }
