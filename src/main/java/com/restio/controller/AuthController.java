@@ -38,7 +38,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // Проверяем учетные данные
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
@@ -46,24 +45,21 @@ public class AuthController {
                 )
         );
 
-        // Устанавливаем аутентификацию в контекст безопасности
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // Генерируем JWT-токен
-        String jwt = jwtUtil.generateToken(loginRequest.getUsername());
-
-        // Возвращаем токен и, возможно, информацию о пользователе
         User user = userService.getUserByUsername(loginRequest.getUsername());
+        // Предполагаем, что у User есть метод getRole(), возвращающий роль, например, "ADMIN"
+        String role = user.getRoles().stream().findFirst().map(Enum::name).orElse("USER"); // Убедитесь, что метод getRole существует в User
+        String jwt = jwtUtil.generateToken(loginRequest.getUsername(), role);
+
         UserDTO userDTO = userService.convertToDTO(user);
         return ResponseEntity.ok(new LoginResponse(jwt, userDTO));
     }
 
-    // Внутренний класс для запроса логина
     public static class LoginRequest {
         private String username;
         private String password;
 
-        // Геттеры и сеттеры
         public String getUsername() {
             return username;
         }
@@ -81,7 +77,6 @@ public class AuthController {
         }
     }
 
-    // Внутренний класс для ответа на логин
     public static class LoginResponse {
         private String token;
         private UserDTO user;

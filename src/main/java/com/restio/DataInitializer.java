@@ -48,7 +48,7 @@ public class DataInitializer {
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setFullName("Администратор Системы");
         Set<Role> adminRoles = new HashSet<>();
-        adminRoles.add(Role.ROLE_ADMIN);
+        adminRoles.add(Role.ADMIN);
         admin.setRoles(adminRoles);
         userRepository.save(admin);
 
@@ -57,7 +57,7 @@ public class DataInitializer {
         waiter.setUsername("waiter");
         waiter.setPassword(passwordEncoder.encode("waiter123"));
         waiter.setFullName("Иван Официантов");
-        waiter.setRoles(Collections.singleton(Role.ROLE_WAITER));
+        waiter.setRoles(Collections.singleton(Role.WAITER));
         userRepository.save(waiter);
 
         // Создаем повара
@@ -65,7 +65,7 @@ public class DataInitializer {
         chef.setUsername("chef");
         chef.setPassword(passwordEncoder.encode("chef123"));
         chef.setFullName("Петр Поваренко");
-        chef.setRoles(Collections.singleton(Role.ROLE_CHEF));
+        chef.setRoles(Collections.singleton(Role.CHEF));
         userRepository.save(chef);
 
         System.out.println("Тестовые пользователи созданы успешно!");

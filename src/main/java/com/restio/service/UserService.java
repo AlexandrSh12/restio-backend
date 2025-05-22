@@ -50,7 +50,7 @@ public class UserService {
 
         // Устанавливаем роли по умолчанию, если не указаны
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
-            user.setRoles(Collections.singleton(Role.ROLE_WAITER));
+            user.setRoles(Collections.singleton(Role.WAITER));
         }
 
         return userRepository.save(user);
