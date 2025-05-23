@@ -9,4 +9,5 @@ public class DishDTO {
     private String category;
     private int price;
     private int cookTime;
+    private String imageUrl;
 }

@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/vite.svg").permitAll()
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/", "/index.html", "/login", "/static/**", "/favicon.ico", "/manifest.json").permitAll()

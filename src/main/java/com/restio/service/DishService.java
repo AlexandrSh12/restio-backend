@@ -67,13 +67,13 @@ public class DishService {
         dto.setCategory(dish.getCategory());
         dto.setPrice(dish.getPrice());
         dto.setCookTime(dish.getCookTime());
+        dto.setImageUrl(dish.getImageUrl()); // Добавьте это
         return dto;
     }
 
     // Преобразование DTO в Entity
     private Dish convertToEntity(DishDTO dto) {
         Dish dish = new Dish();
-        // Не устанавливаем id при создании
         if (dto.getId() != null) {
             dish.setId(dto.getId());
         }
@@ -81,6 +81,7 @@ public class DishService {
         dish.setCategory(dto.getCategory());
         dish.setPrice(dto.getPrice());
         dish.setCookTime(dto.getCookTime());
+        dish.setImageUrl(dto.getImageUrl()); // Добавьте это
         return dish;
     }
 }

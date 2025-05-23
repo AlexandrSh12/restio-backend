@@ -19,4 +19,5 @@ public class Dish {
     private int cookTime;
     private String description;
     private boolean available = true;
+    private String imageUrl; // Новое поле для URL изображения
 }
