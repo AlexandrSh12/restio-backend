@@ -38,25 +38,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
 
         logger.info("Auth header: " + authHeader);
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-            username = jwtUtil.getUsernameFromToken(jwt);
-        }
 
-        if (username == null) {
-            logger.info("No username extracted, proceeding without authentication");
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7);
+                username = jwtUtil.getUsernameFromToken(jwt);
+            }
+        } catch (Exception e) {
+            logger.warning("JWT token parsing failed: " + e.getMessage());
+            jwt = null;
+            username = null;
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtUtil.validateToken(jwt, userDetails)) {
-                String role = jwtUtil.getRoleFromToken(jwt); // "ADMIN"
-                List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                logger.info("Token: " + jwt + ", Role: " + role + ", Authorities: " + authorities);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.info("Authentication successful for user: " + username);
+                }
+            } catch (Exception e) {
+                logger.warning("Authentication failed: " + e.getMessage());
             }
         }
 
