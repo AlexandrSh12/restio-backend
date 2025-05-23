@@ -34,14 +34,14 @@ public class DishController {
     }
 
     @PostMapping
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DishDTO> create(@RequestBody DishDTO dishDTO) {
         DishDTO created = dishService.createDish(dishDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DishDTO> update(@PathVariable Long id, @RequestBody DishDTO dishDTO) {
         return dishService.updateDish(id, dishDTO)
                 .map(ResponseEntity::ok)
@@ -49,7 +49,7 @@ public class DishController {
     }
 
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (dishService.deleteDish(id)) {
             return ResponseEntity.noContent().build();

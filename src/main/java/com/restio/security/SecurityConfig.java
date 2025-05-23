@@ -31,6 +31,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/assets/**").permitAll()
+                        .requestMatchers("/vite.svg").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login", "/static/**", "/favicon.ico", "/manifest.json").permitAll()
                         .requestMatchers("/api/dishes/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
