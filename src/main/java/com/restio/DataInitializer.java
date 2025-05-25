@@ -102,7 +102,7 @@ public class DataInitializer {
         margherita.setCategoryEntity(pizza);
         margherita.setPrice(550);
         margherita.setCookTime(15);
-        margherita.setImageUrl("/images/dishes/marg.jpg"); // Пример пути
+        margherita.setImageUrl("https://sun9-39.userapi.com/impg/oW5ALbk8jx83-lf1SxF6aV_pbYmDiFvHljiRcw/nM5vXKVx0Co.jpg?size=624x416&quality=95&sign=56ac22b9308a7ec8794037cf667c3e36&type=album");
         dishRepository.save(margherita);
 
         Dish pepperoni = new Dish();
@@ -111,7 +111,7 @@ public class DataInitializer {
         pepperoni.setCategoryEntity(pizza);
         pepperoni.setPrice(650);
         pepperoni.setCookTime(15);
-        pepperoni.setImageUrl("/images/dishes/pep.jpg");
+        pepperoni.setImageUrl("https://upload.wikimedia.org/wikipedia/commons/9/91/Pizza-3007395.jpg");
         dishRepository.save(pepperoni);
 
         Dish carbonara = new Dish();
@@ -120,7 +120,7 @@ public class DataInitializer {
         carbonara.setCategoryEntity(pasta);
         carbonara.setPrice(450);
         carbonara.setCookTime(12);
-        carbonara.setImageUrl("/images/dishes/carb.jpg");
+        carbonara.setImageUrl("https://sun9-79.userapi.com/impg/YnJrk2SyGZdOecX64quz-mr_pMxZXBJOhd0J3w/TVBuvv8nObo.jpg?size=2500x1250&quality=95&sign=b8c1b25c101b59cdbac8b811950ee8bb&type=album");
         dishRepository.save(carbonara);
 
         Dish caesar = new Dish();
@@ -129,7 +129,7 @@ public class DataInitializer {
         caesar.setCategoryEntity(salad);
         caesar.setPrice(380);
         caesar.setCookTime(5);
-        caesar.setImageUrl("/images/dishes/salad.jpg");
+        caesar.setImageUrl("https://sun9-80.userapi.com/impg/NJidqhFjfeXPf35KOC4o1Jq0JO_5dcn3HNewTw/-vGguE9eVlI.jpg?size=1342x930&quality=95&sign=4f242e32e049273e23e09b5ad31e4b98&type=album");
         dishRepository.save(caesar);
 
         Dish cola = new Dish();
@@ -138,7 +138,7 @@ public class DataInitializer {
         cola.setCategoryEntity(drinks);
         cola.setPrice(120);
         cola.setCookTime(1);
-        cola.setImageUrl("/images/dishes/cola.jpg");
+        cola.setImageUrl("https://sun9-3.userapi.com/impg/ruHFRuj7RL5_INEEip1ttora4MJmrsOjJBSkDg/jgGRWzpLxZ0.jpg?size=1024x1024&quality=95&sign=3c62f2389a48e1a9c57d14f832caaf09&type=album");
         dishRepository.save(cola);
 
         System.out.println("Тестовое меню создано успешно!");
