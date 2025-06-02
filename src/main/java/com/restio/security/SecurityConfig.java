@@ -45,6 +45,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")
                         .requestMatchers("/api/waiter/**").hasAuthority("ROLE_WAITER")
+                        // Swagger endpoints
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
