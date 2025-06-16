@@ -23,7 +23,7 @@ public class SecurityConfig {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter; // Добавить это
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,32 +31,40 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        // Публичные эндпоинты (без аутентификации)
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/vite.svg").permitAll()
                         .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/admin").permitAll()
                         .requestMatchers("/", "/index.html", "/login", "/static/**", "/favicon.ico", "/manifest.json").permitAll()
                         .requestMatchers("/api/dishes/**").permitAll()
+                        .requestMatchers("/api/categories/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/api/chef/**").hasAuthority("ROLE_CHEF")
-                        .requestMatchers("/api/waiter/**").hasAuthority("ROLE_WAITER")
                         // Swagger endpoints
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
 
+                        // Специфичные роли для определенных эндпоинтов
+                        .requestMatchers("/api/chef/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_CHEF")
+                        .requestMatchers("/api/waiter/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_WAITER")
+
+                        // Админ имеет доступ ко всему (это правило должно быть перед anyRequest().authenticated())
+                        //.requestMatchers("/api/**").hasAuthority("ROLE_ADMIN")
+
+                        // Все остальные API эндпоинты требуют аутентификации
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
                 .headers(headers -> headers
                         .frameOptions(frameOptions -> frameOptions.sameOrigin())
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Изменить это
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

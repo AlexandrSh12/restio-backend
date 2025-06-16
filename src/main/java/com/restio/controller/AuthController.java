@@ -48,9 +48,8 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userService.getUserByUsername(loginRequest.getUsername());
-        // Предполагаем, что у User есть метод getRole(), возвращающий роль, например, "ADMIN"
-        String role = user.getRoles().stream().findFirst().map(Enum::name).orElse("USER"); // Убедитесь, что метод getRole существует в User
-        String jwt = jwtUtil.generateToken(loginRequest.getUsername(), role);
+        // Передаем все роли пользователя в generateToken
+        String jwt = jwtUtil.generateToken(loginRequest.getUsername(), user.getRoles());
 
         UserDTO userDTO = userService.convertToDTO(user);
         return ResponseEntity.ok(new LoginResponse(jwt, userDTO));
