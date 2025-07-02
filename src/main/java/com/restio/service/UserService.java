@@ -94,10 +94,9 @@ public class UserService {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
-        dto.setRole(user.getRoles().stream()
-                .findFirst()
+        dto.setRoles(user.getRoles().stream()
                 .map(Enum::name)
-                .orElse(""));
+                .collect(Collectors.toSet())); // Собираем все роли в Set
         return dto;
     }
 }

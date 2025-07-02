@@ -2,22 +2,34 @@ package com.restio.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 
 @Entity
 @Data
+@Table(name = "dishes")
 public class Dish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category categoryEntity;
-    // Строковое представление категории для обратной совместимости
-    private String category;
-    private int price;
-    private int cookTime;
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @Column(name = "cook_time")
+    private Integer cookTime; // время приготовления в минутах
+
     private String description;
+
+    @Column(nullable = false)
     private boolean available = true;
-    private String imageUrl; // Новое поле для URL изображения
+
+    @Column(name = "image_url")
+    private String imageUrl;
 }

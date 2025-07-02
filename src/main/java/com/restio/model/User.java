@@ -9,6 +9,7 @@ import java.util.Set;
 @Table(name = "users")
 @Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,11 +20,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "full_name")
     private String fullName;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "roles") // Изменено с "role" на "roles"
     private Set<Role> roles = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean active = true;
 }

@@ -1,9 +1,16 @@
 package com.restio.model;
 
-public class ShiftStatus {
-    public static final String ACTIVE = "active";
-    public static final String CLOSED = "closed";
+public enum ShiftStatus {
+    ACTIVE("active"),     // активная смена
+    CLOSED("closed");     // закрытая смена
 
-    // Приватный конструктор, чтобы избежать создания экземпляров
-    private ShiftStatus() {}
+    private final String status;
+
+    ShiftStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }
