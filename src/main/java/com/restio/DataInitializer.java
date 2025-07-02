@@ -20,7 +20,7 @@ import java.util.Set;
 @Configuration
 public class DataInitializer {
 
-    @Autowired
+   /* @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Bean
@@ -56,7 +56,7 @@ public class DataInitializer {
         User waiter = new User();
         waiter.setUsername("waiter");
         waiter.setPassword(passwordEncoder.encode("waiter123"));
-        waiter.setFullName("Иван Официантов");
+        waiter.setFullName("Иван Иванов");
         waiter.setRoles(Collections.singleton(Role.WAITER));
         userRepository.save(waiter);
 
@@ -64,14 +64,14 @@ public class DataInitializer {
         User chef = new User();
         chef.setUsername("chef");
         chef.setPassword(passwordEncoder.encode("chef123"));
-        chef.setFullName("Петр Поваренко");
+        chef.setFullName("Петр Петров");
         chef.setRoles(Collections.singleton(Role.CHEF));
         userRepository.save(chef);
 
         System.out.println("Тестовые пользователи созданы успешно!");
-    }
+    }*/
 
-    private void initMenu(CategoryRepository categoryRepository, DishRepository dishRepository) {
+    /*private void initMenu(CategoryRepository categoryRepository, DishRepository dishRepository) {
 
 
         // Создаем категории
@@ -142,5 +142,5 @@ public class DataInitializer {
         dishRepository.save(cola);
 
         System.out.println("Тестовое меню создано успешно!");
-    }
+    }*/
 }

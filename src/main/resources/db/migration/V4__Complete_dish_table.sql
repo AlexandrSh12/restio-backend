@@ -1,0 +1,2 @@
+ALTER TABLE dish
+    ADD COLUMN IF NOT EXISTS description TEXT;

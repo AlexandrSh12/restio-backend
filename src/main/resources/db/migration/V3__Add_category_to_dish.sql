@@ -1,0 +1,1 @@
+ALTER TABLE dish ADD COLUMN category VARCHAR(255);

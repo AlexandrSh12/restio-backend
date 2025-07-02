@@ -2,12 +2,11 @@ package com.restio.service;
 
 import com.restio.dto.OrderDTO;
 import com.restio.dto.OrderItemDTO;
-import com.restio.model.Dish;
-import com.restio.model.Order;
-import com.restio.model.OrderItem;
+import com.restio.model.*;
 import com.restio.repository.DishRepository;
 import com.restio.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +17,12 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final DishRepository dishRepository;
+    private final ShiftService shiftService;
 
-    public OrderService(OrderRepository orderRepository, DishRepository dishRepository) {
+    public OrderService(OrderRepository orderRepository, DishRepository dishRepository, ShiftService shiftService) {
         this.orderRepository = orderRepository;
         this.dishRepository = dishRepository;
+        this.shiftService = shiftService;
     }
 
     public List<OrderDTO> getAllOrders() {
@@ -35,15 +36,27 @@ public class OrderService {
                 .map(this::convertToDTO);
     }
 
+    @Transactional
     public OrderDTO createOrder(OrderDTO orderDTO) {
         Order order = convertToEntity(orderDTO);
+
+        // Устанавливаем статус по умолчанию
         if (order.getStatus() == null || order.getStatus().isEmpty()) {
-            order.setStatus("submitted");
+            order.setStatus(OrderStatus.SUBMITTED);
         }
+
+        // Получаем активную смену и следующий номер заказа
+        Shift activeShift = shiftService.getOrCreateActiveShift();
+        Integer orderNumber = shiftService.getNextOrderNumber();
+
+        order.setShift(activeShift);
+        order.setOrderNumber(orderNumber);
+
         Order savedOrder = orderRepository.save(order);
         return convertToDTO(savedOrder);
     }
 
+    @Transactional
     public Optional<OrderDTO> updateOrderStatus(String id, String status) {
         Optional<Order> orderOpt = orderRepository.findById(id);
         if (orderOpt.isEmpty()) {
@@ -56,6 +69,7 @@ public class OrderService {
         return Optional.of(convertToDTO(updatedOrder));
     }
 
+    @Transactional
     public Optional<OrderDTO> updateOrderComment(String id, String comment) {
         Optional<Order> orderOpt = orderRepository.findById(id);
         if (orderOpt.isEmpty()) {
@@ -72,6 +86,8 @@ public class OrderService {
     private OrderDTO convertToDTO(Order order) {
         OrderDTO dto = new OrderDTO();
         dto.setId(order.getId());
+        dto.setOrderNumber(order.getOrderNumber());
+        dto.setShiftId(order.getShift() != null ? order.getShift().getId() : null);
         dto.setStatus(order.getStatus());
         dto.setComment(order.getComment());
 
@@ -111,12 +127,12 @@ public class OrderService {
             List<OrderItem> items = dto.getItems().stream()
                     .map(itemDTO -> {
                         OrderItem item = new OrderItem();
-                        if (itemDTO.getId() != null) {
-                            item.setId(itemDTO.getId());
-                        }
+                        //if (itemDTO.getId() != null) {
+                            //item.setId(itemDTO.getId());
+                        //}
 
                         item.setCount(itemDTO.getCount());
-
+                        System.out.println("itemDTO.getDishId(): " + itemDTO.getDishId());
                         if (itemDTO.getDishId() != null) {
                             // Получаем информацию о блюде из репозитория
                             Optional<Dish> dishOpt = dishRepository.findById(itemDTO.getDishId());
