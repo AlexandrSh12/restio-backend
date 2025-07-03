@@ -13,15 +13,15 @@ public class Order {
     @Id
     private String id; // UUID с фронта или генерируется автоматически
 
-    @Column(name = "order_number", nullable = false)
+    @Column(name = "order_number", nullable = true)
     private Integer orderNumber; // Порядковый номер в смене
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shift_id", nullable = false)
+    @JoinColumn(name = "shift_id", nullable = true)
     private Shift shift; // Связь со сменой
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "waiter_id", nullable = false)
+    @JoinColumn(name = "waiter_id", nullable = true)
     private User waiter; // Официант, создавший заказ
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -34,7 +34,7 @@ public class Order {
 
     private String comment; // комментарий к заказу
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
 
     @Column(name = "submitted_at")
